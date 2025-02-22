@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html lang="vi">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -16,6 +15,7 @@
             --shadow-dark: #bebebe;
             --shadow-light: #ffffff;
             --container-bg: #e0e0e0;
+            --scrollbar-width: 12px;
         }
 
         [data-theme="dark"] {
@@ -26,6 +26,41 @@
             --container-bg: #1a1f25;
         }
 
+        /* Scrollbar styling */
+        ::-webkit-scrollbar {
+            width: var(--scrollbar-width);
+            height: var(--scrollbar-width);
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--container-bg);
+            border-radius: calc(var(--scrollbar-width) / 2);
+            box-shadow: 
+                inset 3px 3px 6px var(--shadow-dark),
+                inset -3px -3px 6px var(--shadow-light);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--container-bg);
+            border-radius: calc(var(--scrollbar-width) / 2);
+            box-shadow: 
+                2px 2px 4px var(--shadow-dark),
+                -2px -2px 4px var(--shadow-light);
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            box-shadow: 
+                3px 3px 6px var(--shadow-dark),
+                -3px -3px 6px var(--shadow-light);
+        }
+
+        ::-webkit-scrollbar-thumb:active {
+            box-shadow: 
+                inset 2px 2px 4px var(--shadow-dark),
+                inset -2px -2px 4px var(--shadow-light);
+        }
+
+        /* Rest of your existing styles */
         body {
             font-family: 'Montserrat', sans-serif;
             background: var(--bg-color);
@@ -53,6 +88,7 @@
             transition: all 0.3s ease;
         }
 
+        /* Your existing styles continue here... */
         .theme-switch {
             position: fixed;
             top: 20px;
@@ -215,7 +251,7 @@
         #copy-btn:active {
             box-shadow:
                 inset 6px 6px 12px var(--shadow-dark),
-                inset -6px -6px 12px var (--shadow-light);
+                inset -6px -6px 12px var(--shadow-light);
         }
 
         .copy-message {
@@ -242,7 +278,6 @@
                 opacity: 0;
                 transform: translateY(-20px);
             }
-
             to {
                 opacity: 1;
                 transform: translateY(0);
@@ -280,15 +315,15 @@
     <div class="copy-message">Copied to clipboard!</div>
 
     <script>
-        $(document).ready(function () {
-            $('#themeSwitch').click(function () {
+        $(document).ready(function() {
+            $('#themeSwitch').click(function() {
                 $('body').attr('data-theme',
                     $('body').attr('data-theme') === 'dark' ? 'light' : 'dark'
                 );
                 $('.theme-switch-handle i').toggleClass('fa-moon fa-sun');
             });
 
-            $('#inputText').on('input', function () {
+            $('#inputText').on('input', function() {
                 let input = $(this).val();
                 let output = '';
 
@@ -301,7 +336,7 @@
                 $('#outputText').val(output);
             });
 
-            $('#copy-btn').click(function () {
+            $('#copy-btn').click(function() {
                 let outputText = $('#outputText');
                 outputText.select();
                 document.execCommand('copy');
@@ -316,5 +351,4 @@
         });
     </script>
 </body>
-
 </html>
