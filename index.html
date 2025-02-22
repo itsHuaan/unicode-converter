@@ -85,8 +85,22 @@
             font-size: 12px;
         }
 
+        .theme-switch-handle i {
+            transition: transform 0.3s ease, opacity 0.3s ease;
+        }
+
         [data-theme="dark"] .theme-switch-handle {
             transform: translateX(30px);
+        }
+
+        [data-theme="dark"] .theme-switch-handle i.fa-sun {
+            transform: rotate(180deg);
+            opacity: 0;
+        }
+
+        [data-theme="light"] .theme-switch-handle i.fa-moon {
+            transform: rotate(180deg);
+            opacity: 0;
         }
 
         h2 {
@@ -156,21 +170,12 @@
 
         #convert-icon {
             font-size: 24px;
-            cursor: pointer;
             transition: 0.3s;
             color: var(--text-color);
-            padding: 15px;
-            border-radius: 50%;
-            box-shadow:
-                8px 8px 16px var(--shadow-dark),
-                -8px -8px 16px var(--shadow-light);
         }
 
         #convert-icon:hover {
             opacity: 0.8;
-            box-shadow:
-                12px 12px 24px var(--shadow-dark),
-                -12px -12px 24px var(--shadow-light);
         }
 
         #convert-icon:active {
