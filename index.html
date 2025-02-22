@@ -215,6 +215,23 @@
                 transform: scale(1);
             }
         }
+
+        #convert-icon {
+            font-size: 24px;
+            cursor: pointer;
+            transition: 0.3s;
+            color: #ff6b6b;
+            margin: 15px 0 25px 0;
+        }
+
+        #convert-icon:hover {
+            transform: translateY(-3px);
+            color: #ff8e8e;
+        }
+
+        #convert-icon:active {
+            transform: translateY(1px);
+        }
     </style>
 </head>
 
@@ -228,7 +245,7 @@
         </div>
 
         <div class="button-container">
-            <button id="convertBtn">✨ Chuyển đổi ✨</button>
+            <i id="convert-icon" class="fas fa-arrow-down"></i>
         </div>
 
         <div class="textarea-container">
@@ -242,14 +259,9 @@
 
     <script>
         $(document).ready(function () {
-            $('#convertBtn').click(function () {
-                let input = $('#inputText').val();
+            $('#inputText').on('input', function () {
+                let input = $(this).val();
                 let output = '';
-
-                $(this).css('transform', 'scale(0.95)');
-                setTimeout(() => {
-                    $(this).css('transform', 'scale(1)');
-                }, 150);
 
                 for (let i = 0; i < input.length; i++) {
                     let char = input[i];
