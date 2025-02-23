@@ -1,11 +1,12 @@
 <!DOCTYPE html>
-<html lang="vi">
+<html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Unicode Escape Encoder</title>
+    <title>Bidirectional Unicode Escape Converter</title>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.css">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&display=swap');
 
@@ -26,7 +27,6 @@
             --container-bg: #1a1f25;
         }
 
-        /* Scrollbar styling */
         ::-webkit-scrollbar {
             width: var(--scrollbar-width);
             height: var(--scrollbar-width);
@@ -35,7 +35,7 @@
         ::-webkit-scrollbar-track {
             background: var(--container-bg);
             border-radius: calc(var(--scrollbar-width) / 2);
-            box-shadow: 
+            box-shadow:
                 inset 3px 3px 6px var(--shadow-dark),
                 inset -3px -3px 6px var(--shadow-light);
         }
@@ -43,24 +43,23 @@
         ::-webkit-scrollbar-thumb {
             background: var(--container-bg);
             border-radius: calc(var(--scrollbar-width) / 2);
-            box-shadow: 
+            box-shadow:
                 2px 2px 4px var(--shadow-dark),
                 -2px -2px 4px var(--shadow-light);
         }
 
         ::-webkit-scrollbar-thumb:hover {
-            box-shadow: 
+            box-shadow:
                 3px 3px 6px var(--shadow-dark),
                 -3px -3px 6px var(--shadow-light);
         }
 
         ::-webkit-scrollbar-thumb:active {
-            box-shadow: 
+            box-shadow:
                 inset 2px 2px 4px var(--shadow-dark),
                 inset -2px -2px 4px var(--shadow-light);
         }
 
-        /* Rest of your existing styles */
         body {
             font-family: 'Montserrat', sans-serif;
             background: var(--bg-color);
@@ -89,7 +88,6 @@
             transition: all 0.3s ease;
         }
 
-        /* Your existing styles continue here... */
         .theme-switch {
             position: fixed;
             top: 20px;
@@ -221,7 +219,7 @@
                 inset -8px -8px 16px var(--shadow-light);
         }
 
-        #copy-btn {
+        .copy-btn {
             position: absolute;
             right: 10px;
             top: 10px;
@@ -242,14 +240,14 @@
                 -6px -6px 12px var(--shadow-light);
         }
 
-        #copy-btn:hover {
+        .copy-btn:hover {
             opacity: 0.8;
             box-shadow:
                 8px 8px 16px var(--shadow-dark),
                 -8px -8px 16px var(--shadow-light);
         }
 
-        #copy-btn:active {
+        .copy-btn:active {
             box-shadow:
                 inset 6px 6px 12px var(--shadow-dark),
                 inset -6px -6px 12px var(--shadow-light);
@@ -279,10 +277,28 @@
                 opacity: 0;
                 transform: translateY(-20px);
             }
+
             to {
                 opacity: 1;
                 transform: translateY(0);
             }
+        }
+
+        .arrows-container {
+            display: flex;
+            justify-content: center;
+            gap: 5px;
+            margin: 30px;
+        }
+
+        .arrow-icon {
+            font-size: 20px;
+            color: var(--text-color);
+            transition: 0.3s;
+        }
+
+        .arrow-icon:hover {
+            opacity: 0.8;
         }
     </style>
 </head>
@@ -295,61 +311,108 @@
     </div>
 
     <div class="container">
-        <h2>Text to Unicode Escape</h2>
+        <h2>Bidirectional Unicode Converter</h2>
 
         <div class="textarea-container">
-            <span class="label">Original</span>
-            <textarea id="inputText" placeholder="Enter the text to be encoded..."></textarea>
+            <span class="label">Normal Text</span>
+            <textarea id="inputText" placeholder="Enter normal text or paste Unicode escapes here..."></textarea>
+            <button class="copy-btn" id="copyInput" title="Copy to clipboard"><i class="fas fa-copy"></i></button>
         </div>
 
-        <div class="button-container">
-            <i id="convert-icon" class="fas fa-arrow-down"></i>
+        <div class="arrows-container">
+            <i class="fas fa-arrow-down arrow-icon"></i>
+            <i class="fas fa-arrow-up arrow-icon"></i>
         </div>
 
         <div class="textarea-container">
-            <span class="label">Encoded</span>
-            <textarea id="outputText" readonly></textarea>
-            <button id="copy-btn" title="Sao chép vào clipboard"><i class="fas fa-copy"></i></button>
+            <span class="label">Unicode Escape</span>
+            <textarea id="outputText" placeholder="Unicode escape sequence will appear here..."></textarea>
+            <button class="copy-btn" id="copyOutput" title="Copy to clipboard"><i class="fas fa-copy"></i></button>
         </div>
     </div>
 
     <div class="copy-message">Copied to clipboard!</div>
 
     <script>
-        $(document).ready(function() {
-            $('#themeSwitch').click(function() {
+        $(document).ready(function () {
+            let isProcessing = false;
+
+            // Theme switcher
+            $('#themeSwitch').click(function () {
                 $('body').attr('data-theme',
                     $('body').attr('data-theme') === 'dark' ? 'light' : 'dark'
                 );
                 $('.theme-switch-handle i').toggleClass('fa-moon fa-sun');
             });
 
-            $('#inputText').on('input', function() {
-                let input = $(this).val();
+            // Convert normal text to Unicode escape
+            function textToUnicode(text) {
                 let output = '';
-
-                for (let i = 0; i < input.length; i++) {
-                    let char = input[i];
+                for (let i = 0; i < text.length; i++) {
+                    let char = text[i];
                     let code = char.charCodeAt(0);
                     output += code > 127 ? '\\u' + code.toString(16).padStart(4, '0') : char;
                 }
+                return output;
+            }
 
-                $('#outputText').val(output);
+            // Convert Unicode escape to normal text
+            function unicodeToText(text) {
+                return text.replace(/\\u([0-9a-fA-F]{4})/g, function (match, group1) {
+                    return String.fromCharCode(parseInt(group1, 16));
+                });
+            }
+
+            // Handle input text changes
+            $('#inputText').on('input', function () {
+                if (!isProcessing) {
+                    isProcessing = true;
+                    let input = $(this).val();
+                    let output = textToUnicode(input);
+                    $('#outputText').val(output);
+                    isProcessing = false;
+                }
             });
 
-            $('#copy-btn').click(function() {
-                let outputText = $('#outputText');
-                outputText.select();
-                document.execCommand('copy');
+            // Handle output text changes
+            $('#outputText').on('input', function () {
+                if (!isProcessing) {
+                    isProcessing = true;
+                    try {
+                        let input = $(this).val();
+                        let output = unicodeToText(input);
+                        $('#inputText').val(output);
+                    } catch (e) {
+                        console.error('Error converting Unicode:', e);
+                    }
+                    isProcessing = false;
+                }
+            });
 
+            // Copy button functionality
+            function copyText(element) {
+                element.select();
+                document.execCommand('copy');
+                showCopyMessage();
+            }
+
+            function showCopyMessage() {
                 const copyMessage = $('.copy-message');
                 copyMessage.addClass('show');
-
                 setTimeout(() => {
                     copyMessage.removeClass('show');
                 }, 2000);
+            }
+
+            $('#copyInput').click(function () {
+                copyText($('#inputText')[0]);
+            });
+
+            $('#copyOutput').click(function () {
+                copyText($('#outputText')[0]);
             });
         });
     </script>
 </body>
+
 </html>
